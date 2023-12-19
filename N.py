@@ -185,7 +185,6 @@ Y_checked = np.zeros(40)
 for j in range(0, 40):
     for i in range(0, theta_checked.size):
         Y_checked[j] += theta_checked[i] * (x[j]**i)
-
 #       2
 
 theta_intervals1 = np.array([np.ones(m+1), np.ones(m+1)]).transpose()
@@ -256,7 +255,7 @@ ax2 = fig2.add_subplot(1, 1, 1)
 
 ax.plot(x, Y_real, label = "real function")
 ax.plot(x, Y, label = "function with noise", ls = 'None',marker='.')
-ax.plot(x, Y_checked, label = "checked function")
+ax2.plot(x, Y_checked, label = "checked function")
 
 
 EPS_max = max(E)

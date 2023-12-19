@@ -166,14 +166,47 @@ def task_3(p):
     return get_interval(p, level=0.95), get_interval(p, level=0.99)
 
 
-# print("-------------------1 номер-------------------")
-# Theta, Z, p = task_1()
-# print(f"Вектор-строку коэффициентов {Theta}\nМодель имеет порядок {p}\nZ = {Z**2}")
-# print("---------------------------------------------")
-#
-# print("-------------------2 номер-------------------")
-# level_095, level_099 = task_2(p)
-# print(f"Для уровня надежности = 0.95\n{level_095}\n")
-# print(f"Для уровня надежности = 0.99\n{level_099}")
-# print("---------------------------------------------")
-print(*task_3(2), sep="\n")
+def task_4(theta_m, level_095, level_099):
+    X = np.zeros((40, 4))
+
+    for i in range(40):
+        X[i][0] = 1
+        X[i][1] = (-4 + (i + 1) * 8 / n)
+        X[i][2] = (-4 + (i + 1) * 8 / n) ** 2
+        X[i][3] = (-4 + (i + 1) * 8 / n) ** 3
+
+    Y_without_noise = np.dot(X, theta)
+    Y_with_noise = np.dot(X, theta) + EPS
+
+    fig = plt.figure(figsize=[14,10])
+    ax = fig.add_subplot(1, 1, 1)
+
+    ax.plot(x:=X.transpose()[1], Y_without_noise, label="Истинный полезный сигнал")
+    ax.plot(x, Y_with_noise, label="Набор наблюдений", ls = 'None',marker='.')
+    y_check = np.zeros(n)
+    for i in range(n):
+        for j in range(len(theta_m)):
+            y_check[i] += theta_m[j]*(x[i]**j)
+    ax.plot(x, y_check, label="Оценка полезного сигнала")
+    ax.plot(x, [level_095[i][0] for i in range(n)], label="Доверительный интервал нижний для alpha = 0.95")
+    ax.plot(x, [level_095[i][1] for i in range(n)], label="Доверительный интервал верхний для alpha = 0.95")
+    # ax.plot(x, [level_099[i][0] for i in range(n)], label="Доверительный интервал нижний для alpha = 0.99")
+    # ax.plot(x, [level_099[i][1] for i in range(n)], label="Доверительный интервал верхний для alpha = 0.99")
+
+    ax.legend()
+
+    plt.show()
+
+print("-------------------1 номер-------------------")
+Theta, Z, p = task_1()
+print(f"Вектор-строку коэффициентов {Theta}\nМодель имеет порядок {p}\nZ = {Z**2}")
+print("---------------------------------------------")
+
+print("-------------------2 номер-------------------")
+level_095, level_099 = task_2(p)
+print(f"Для уровня надежности = 0.95\n{level_095}\n")
+print(f"Для уровня надежности = 0.99\n{level_099}")
+print("---------------------------------------------")
+level_095_for_signal, level_099_for_signal = task_3(p)
+
+task_4(Theta, level_095_for_signal, level_099_for_signal)
