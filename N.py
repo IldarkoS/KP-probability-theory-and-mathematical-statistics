@@ -268,6 +268,8 @@ bars = []
 for i in range (-1, 7):
     bars.append(EPS_min + step*i + 0.0001*i)
 
+ax1.hist(E, bars, density = True)
+
 ax2.plot(x, Y_real, label = "real function")
 # ax2.plot(x, Y_right1, label = "bigger function 0.95")
 # ax2.plot(x, Y_left1, label = "lesser function 0.95")
@@ -287,7 +289,7 @@ sigma_hat_squared = (mod_E * mod_E/(40-m))
 print(mod_E*mod_E)
 print(sigma_hat_squared)
 
-print(theta_checked)
+# print(theta_checked)
 
 
 
@@ -295,28 +297,28 @@ print(theta_checked)
 
 p_hat = np.zeros(7)
 for i in range(0, 40):
-    if E[i] >= bars[1] and E[i] <= bars[2]:
+    if E[i] >= bars[1] and E[i] < bars[2]:
         p_hat[1] += 1
 
 for i in range(0, 40):
-    if E[i] > bars[2] and E[i] <= bars[3]:
+    if E[i] >= bars[2] and E[i] < bars[3]:
         p_hat[2] += 1
 
 for i in range(0, 40):
-    if E[i] > bars[3] and E[i] <= bars[4]:
+    if E[i] >= bars[3] and E[i] < bars[4]:
         p_hat[3] += 1
 
 for i in range(0, 40):
-    if E[i] > bars[4] and E[i] <= bars[5]:
+    if E[i] >= bars[4] and E[i] < bars[5]:
         p_hat[4] += 1
 
 for i in range(0, 40):
-    if E[i] > bars[5] and E[i] <= bars[6]:
+    if E[i] >= bars[5] and E[i] < bars[6]:
         p_hat[5] += 1
 
 for i in range(1, 6):
     p_hat[i] /= 40
-
+print(f"FFFFFFFFFFFFFFFFFFFFFFFFFF{p_hat}")
 p_not_hat = np.zeros(7)
 
 p_not_hat[0] = scipy.stats.norm.cdf(EPS_min/np.sqrt(sigma_hat_squared)) - scipy.stats.norm.cdf(-100/np.sqrt(sigma_hat_squared))
@@ -338,7 +340,6 @@ if  0 < TZn and TZn < chi2.ppf(0.95, 5):
 else:
     print("                      ")
 
-ax1.hist(E, bars, density = True)
 
 
 print(sigma_hat_squared)

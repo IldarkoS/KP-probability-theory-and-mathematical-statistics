@@ -15,7 +15,7 @@ import xlwt
 # for i in range(40):
 #       sheet1.write(i, 0, txt[i])
 #
-# book.save("spreadsheet1.xls")
+# book.save("spreadsheet.xls")
 #
 # plt.hist(txt)
 #
