@@ -3,46 +3,46 @@ import matplotlib.pyplot as plt
 from scipy.stats import t, norm, chi2
 
 EPS = np.array(
-    [0.5825356586711,
-     0.779136241919401,
-     0.069108921157575,
-     0.133724868503062,
-     -0.185744449477847,
-     -1.1777860134251,
-     0.739550630925385,
-     0.885757877426329,
-     0.244582137320006,
-     0.791348132291261,
-     0.542194571144387,
-     0.140962632813154,
-     0.914079982466143,
-     1.11493101721298,
-     -1.19059423052731,
-     0.170760986395866,
-     -0.09412406540652,
-     1.07532818795774,
-     0.93684563929557,
-     -3.13208181730096,
-     0.199991156127484,
-     -0.917857248143994,
-     -0.537772490298977,
-     0.153056138636936,
-     -0.0471328256533068,
-     -0.453000226511304,
-     0.522747089851915,
-     -1.71017005474495,
-     -1.88558100989699,
-     -0.769550314820384,
-     0.519057251415655,
-     0.182434800723214,
-     -0.175139291126682,
-     1.84149902650684,
-     2.1151541477258,
-     0.0187015347546949,
-     0.398284526834759,
-     1.35459474080133,
-     1.34173415315512,
-     -0.587816367648232
+    [-1.57570224093566,
+     0.026817652058368,
+     -0.327083400768208,
+     0.384457963489581,
+     1.13092869940426,
+     0.496851264054229,
+     0.907339535512404,
+     0.100098748083528,
+     2.49180275180069,
+     -0.0728842702874212,
+     0.826877669546407,
+     3.12941087626926,
+     -0.290112040544173,
+     0.273222919888945,
+     0.945511583398219,
+     -1.76916070866538,
+     1.40708789619999,
+     -2.48341591842828,
+     -2.77630227137947,
+     3.13991491474395,
+     1.10107674176732,
+     -0.257722179163009,
+     -1.73620920255182,
+     -1.84146124965671,
+     -1.43220867624349,
+     -0.657551650718961,
+     0.186855475002093,
+     -2.35604061658699,
+     1.03240424046648,
+     0.334456144504168,
+     0.470946667999632,
+     -1.76644417119997,
+     1.23171894652158,
+     -2.41344098737007,
+     -0.553993401124847,
+     0.712286159261229,
+     -0.229382238056625,
+     2.02815685186965,
+     2.95489535309773,
+     0.147225408140916
      ])
 
 n = 40
@@ -53,8 +53,6 @@ theta2 = 1
 theta3 = -0.07
 
 theta = np.array([theta0, theta1, theta2, theta3])
-# theta = np.array([20, -2, -1, -0.06])
-# theta = np.array([11, -3, 6, 0.12])
 
 
 def y(th0, th1, th2, th3, t):
@@ -73,7 +71,7 @@ def task_1():
         X[i][5] = (-4 + (i + 1) * 8 / n) ** 5
 
     Y = np.dot(X[:n, :4], theta) + EPS
-
+    print(Y)
     def get_stat(p, alpha=0.05):
         X_m = X[:n, :p + 1]
 
@@ -92,7 +90,7 @@ def task_1():
         # print(p, Theta_m, CentralStatistics, quant_m)
         return Theta_m, CentralStatistics, quant_m
 
-    p = 2
+    p = 1
     while True:
         Theta, Z, quant = get_stat(p)
         if abs(Z) > quant:
@@ -136,7 +134,7 @@ def task_2(p):
     return get_interval(p, level=0.95), get_interval(p, level=0.99)
 
 
-def task_3(p):
+def task_3(p, hatTheta):
     X = np.zeros((40, 4))
 
     for i in range(40):
@@ -146,8 +144,9 @@ def task_3(p):
         X[i][3] = (-4 + (i + 1) * 8 / n) ** 3
 
     Y = np.dot(X, theta) + EPS
-    hatY = np.dot(X, theta)
     X_m = X[:40, :p + 1]
+
+    hatY = np.dot(X_m, hatTheta)
 
     Theta_m = np.dot(np.dot(np.linalg.inv(np.dot(np.transpose(X_m), X_m)), np.transpose(X_m)), Y)
 
@@ -182,6 +181,8 @@ def task_4(theta_m, level_095, level_099):
         X[i][2] = (-4 + (i + 1) * 8 / n) ** 2
         X[i][3] = (-4 + (i + 1) * 8 / n) ** 3
 
+    X_m = X[:40, :len(theta_m)]
+
     Y_without_noise = np.dot(X, theta)
     Y_with_noise = np.dot(X, theta) + EPS
 
@@ -190,11 +191,8 @@ def task_4(theta_m, level_095, level_099):
 
     ax.plot(x := X.transpose()[1], Y_without_noise, label="Истинный полезный сигнал")
     ax.plot(x, Y_with_noise, label="Набор наблюдений", ls='None', marker='.')
-    y_check = np.zeros(n)
-    for i in range(n):
-        for j in range(len(theta_m)):
-            y_check[i] += theta_m[j] * (x[i] ** j)
-    ax.plot(x, y_check, label="Оценка полезного сигнала")
+    y_check = np.dot(X_m, theta_m)
+    ax.plot(x, y_check, label="Оценка полезного сигнала", ls='None', marker='.')
     ax.plot(x, [level_095[i][0] for i in range(n)], label="Доверительный интервал нижний для alpha = 0.95")
     ax.plot(x, [level_095[i][1] for i in range(n)], label="Доверительный интервал верхний для alpha = 0.95")
     ax.plot(x, [level_099[i][0] for i in range(n)], label="Доверительный интервал нижний для alpha = 0.99")
@@ -241,7 +239,10 @@ def task_6(p):
 
     NormaE = np.dot(np.transpose(hatE), hatE)
 
-    dispersion = NormaE / (n - (p + 1))
+    # print(NormaE)
+    # print(hatE, np.var(hatE))
+    # dispersion = np.var(hatE)
+    dispersion = NormaE/n
 
     return dispersion
 
@@ -265,15 +266,16 @@ def task_7(gistogramma):
     NormaE = np.dot(np.transpose(hatE), hatE)
 
     sigma = NormaE / n
-
+    # print(sigma)
     def T(gistogramma):
         T = 0
         for i in range(len(gistogramma[0]) - 1):
             T += (pk := (norm.cdf(gistogramma[1][i + 1] / sigma ** 0.5) - norm.cdf(gistogramma[1][i] / sigma ** 0.5)) -
                         gistogramma[0][i]) ** 2 / pk
         return T * n
-
     TZn = T(gistogramma)
+    # print(TZn)
+    # print(chi2.ppf(0.95, 5))
     return "Распределение ошибок нормальное" if 0 < TZn < chi2.ppf(0.95,
                                                                    5) else "Распределение ошибок не является нормальным"
 
@@ -289,7 +291,7 @@ print(f"Для уровня надежности = 0.95\n{level_095}\n")
 print(f"Для уровня надежности = 0.99\n{level_099}")
 print("---------------------------------------------")
 print("-------------------3 номер-------------------")
-level_095_for_signal, level_099_for_signal = task_3(p)
+level_095_for_signal, level_099_for_signal = task_3(p, Theta)
 print(f"Для уровня надежности = 0.95\n{level_095_for_signal}\n")
 print(f"Для уровня надежности = 0.99\n{level_099_for_signal}")
 print("---------------------------------------------")
@@ -301,7 +303,7 @@ gistogramma = task_5()
 print("---------------------------------------------")
 print("-------------------6 номер-------------------")
 dispersion = task_6(p)
-print(f"Несмещенная норма дисперсии: {dispersion}")
+print(f"Оценка максимального правдоподобия дисперсии: {dispersion}")
 print("---------------------------------------------")
 print("-------------------7 номер-------------------")
 print(task_7(gistogramma))
