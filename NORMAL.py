@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import t, norm, chi2
+from scipy.stats import t, norm, chi2, f
 
 EPS = np.array(
     [-1.57570224093566,
@@ -71,15 +71,13 @@ def task_1():
         X[i][5] = (-4 + (i + 1) * 8 / n) ** 5
 
     Y = np.dot(X[:n, :4], theta) + EPS
-    print(Y)
+
     def get_stat(p, alpha=0.05):
         X_m = X[:n, :p + 1]
 
         Theta_m = np.dot(np.dot(np.linalg.inv(np.dot(np.transpose(X_m), X_m)), np.transpose(X_m)), Y)
 
-        quant_m = t.ppf(
-            q=1 - alpha / 2,
-            df=n - (p + 1))
+        quant_m = f.ppf(1 - alpha, 1, n - (p + 1))
 
         alpha_m = np.linalg.inv(np.dot(np.transpose(X_m), X_m))[p, p]
 
@@ -160,9 +158,7 @@ def task_3(p, hatTheta):
     def get_interval(p, level):
         left = np.zeros(n)
         right = np.zeros(n)
-        quant_m = t.ppf(
-            q=1 - (1 - level) / 2,
-            df=n - (p + 1))
+        quant_m = t.ppf(q=1 - (1 - level) / 2, df=n - (p + 1))
         for i in range(n):
             left[i] = hatY[i] - quant_m * (NormaE * alpha(i)) ** 0.5 / (n - (p + 1)) ** 0.5
             right[i] = hatY[i] + quant_m * (NormaE * alpha(i)) ** 0.5 / (n - (p + 1)) ** 0.5
@@ -192,6 +188,7 @@ def task_4(theta_m, level_095, level_099):
     ax.plot(x := X.transpose()[1], Y_without_noise, label="Истинный полезный сигнал")
     ax.plot(x, Y_with_noise, label="Набор наблюдений", ls='None', marker='.')
     y_check = np.dot(X_m, theta_m)
+    print(y_check)
     ax.plot(x, y_check, label="Оценка полезного сигнала", ls='None', marker='.')
     ax.plot(x, [level_095[i][0] for i in range(n)], label="Доверительный интервал нижний для alpha = 0.95")
     ax.plot(x, [level_095[i][1] for i in range(n)], label="Доверительный интервал верхний для alpha = 0.95")
@@ -267,15 +264,23 @@ def task_7(gistogramma):
 
     sigma = NormaE / n
     # print(sigma)
+    print("p_k:")
     def T(gistogramma):
         T = 0
-        for i in range(len(gistogramma[0]) - 1):
-            T += (pk := (norm.cdf(gistogramma[1][i + 1] / sigma ** 0.5) - norm.cdf(gistogramma[1][i] / sigma ** 0.5)) -
-                        gistogramma[0][i]) ** 2 / pk
+        for i in range(-1, len(gistogramma[0]) + 1):
+            if i == -1:
+                T += (pk := (norm.cdf(gistogramma[1][i + 1] / sigma ** 0.5) - norm.cdf(-100 / sigma ** 0.5))) ** 2 / pk
+
+            elif i == len(gistogramma[0]):
+                T += (pk := (norm.cdf(+ 100 / sigma ** 0.5) - norm.cdf(gistogramma[1][i] / sigma ** 0.5))) ** 2 / pk
+
+            else:
+                T += (pk := (norm.cdf(gistogramma[1][i + 1] / sigma ** 0.5) - norm.cdf(gistogramma[1][i] / sigma ** 0.5)) - gistogramma[0][i]) ** 2 / pk
+            print(abs(pk))
         return T * n
     TZn = T(gistogramma)
-    # print(TZn)
-    # print(chi2.ppf(0.95, 5))
+    print(TZn)
+    print(chi2.ppf(0.95, 5))
     return "Распределение ошибок нормальное" if 0 < TZn < chi2.ppf(0.95,
                                                                    5) else "Распределение ошибок не является нормальным"
 
@@ -284,7 +289,6 @@ print("-------------------1 номер-------------------")
 Theta, Z, p = task_1()
 print(f"Вектор-строка коэффициентов {Theta}\nМодель имеет порядок {p}\nZ = {Z}")
 print("---------------------------------------------")
-#
 print("-------------------2 номер-------------------")
 level_095, level_099 = task_2(p)
 print(f"Для уровня надежности = 0.95\n{level_095}\n")
