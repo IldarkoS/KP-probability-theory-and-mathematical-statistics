@@ -216,8 +216,9 @@ def task_5():
     hatE = Y - np.dot(X_m, Theta_m)
     a = ax.hist(hatE, bins=5, density=True, label="Гистограмма остатков регрессии")
     ax.legend()
+    normal_hist = np.histogram(hatE, bins=5)
+    # return [[x/n for x in normal_hist[0]], a[1]]
     return a
-
 
 def task_6(p):
     X = np.zeros((40, 4))
@@ -244,7 +245,7 @@ def task_6(p):
     return dispersion
 
 
-def task_7(gistogramma):
+def task_7(gistogramma, p):
     # print(gistogramma)
     X = np.zeros((40, 4))
 
@@ -262,25 +263,25 @@ def task_7(gistogramma):
 
     NormaE = np.dot(np.transpose(hatE), hatE)
 
-    sigma = NormaE / n
+    sigma = NormaE / (n - (p+1))
     # print(sigma)
     print("p_k:")
     def T(gistogramma):
         T = 0
+        s = 0
         for i in range(-1, len(gistogramma[0]) + 1):
             if i == -1:
-                T += (pk := (norm.cdf(gistogramma[1][i + 1] / sigma ** 0.5) - norm.cdf(-100 / sigma ** 0.5))) ** 2 / pk
+                T += (pk := (norm.cdf(gistogramma[1][i + 1] / sigma ** 0.5) - norm.cdf(-100 / sigma ** 0.5)))
 
             elif i == len(gistogramma[0]):
-                T += (pk := (norm.cdf(+ 100 / sigma ** 0.5) - norm.cdf(gistogramma[1][i] / sigma ** 0.5))) ** 2 / pk
-
+                T += (pk := (norm.cdf(+ 100 / sigma ** 0.5) - norm.cdf(gistogramma[1][i]/ sigma ** 0.5)))
             else:
-                T += (pk := (norm.cdf(gistogramma[1][i + 1] / sigma ** 0.5) - norm.cdf(gistogramma[1][i] / sigma ** 0.5)) - gistogramma[0][i]) ** 2 / pk
-            print(abs(pk))
+                T += ((pk := (norm.cdf(gistogramma[1][i + 1] / sigma ** 0.5) - norm.cdf(gistogramma[1][i] / sigma ** 0.5))) - gistogramma[0][i]) ** 2 / pk
+            print(pk)
         return T * n
     TZn = T(gistogramma)
-    print(TZn)
-    print(chi2.ppf(0.95, 5))
+    print(f"T(Zn) = {TZn}")
+    print(f"X^2 = {chi2.ppf(0.95, 5)}")
     return "Распределение ошибок нормальное" if 0 < TZn < chi2.ppf(0.95,
                                                                    5) else "Распределение ошибок не является нормальным"
 
@@ -310,6 +311,6 @@ dispersion = task_6(p)
 print(f"Оценка максимального правдоподобия дисперсии: {dispersion}")
 print("---------------------------------------------")
 print("-------------------7 номер-------------------")
-print(task_7(gistogramma))
+print(task_7(gistogramma, p))
 print("---------------------------------------------")
 plt.show()

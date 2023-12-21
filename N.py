@@ -319,6 +319,7 @@ for i in range(0, 40):
 for i in range(1, 6):
     p_hat[i] /= 40
 print(f"FFFFFFFFFFFFFFFFFFFFFFFFFF{p_hat}")
+print(bars)
 p_not_hat = np.zeros(7)
 
 p_not_hat[0] = scipy.stats.norm.cdf(EPS_min/np.sqrt(sigma_hat_squared)) - scipy.stats.norm.cdf(-100/np.sqrt(sigma_hat_squared))
@@ -332,6 +333,8 @@ for i in range(0, 7):
     TZn += ((p_not_hat[i] - p_hat[i]) * (p_not_hat[i] - p_hat[i]))/p_not_hat[i]
 
 TZn *= 40
+
+print(f"БЕЗ КРЫШКИ{p_not_hat}, {sum(p_not_hat)}")
 
 from scipy.stats import chi2
 
