@@ -88,7 +88,7 @@ def task_1():
         # print(p, Theta_m, CentralStatistics, quant_m)
         return Theta_m, CentralStatistics, quant_m
 
-    p = 1
+    p = 2
     while True:
         Theta, Z, quant = get_stat(p)
         if abs(Z) > quant:
